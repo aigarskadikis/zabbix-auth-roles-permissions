@@ -42,6 +42,12 @@ Download this project
 cd && git clone https://github.com/aigarskadikis/zabbix-auth-roles-permissions.git && cd zabbix-auth-roles-permissions
 ```
 
+Set python scripts executable:
+```
+chmod +x *.py
+```
+
+
 ## Install API access characteristics
 
 Create directory
