@@ -34,8 +34,16 @@ token = config.api_token
 headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer '+token}
 
 currentLDAPSettings = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
-{"jsonrpc":"2.0","method":"authentication.get","params":{"output":"extend"},"id":1}
-), verify=False).text))[0].value
+    {
+	"jsonrpc": "2.0",
+	"method": "userdirectory.get",
+	"params": {
+		"output": "extend",
+		"selectProvisionMedia": "extend",
+		"selectProvisionGroups": "extend"
+	},
+	"id": 1
+}
+    ), verify=False).text))[0].value
 
-print(currentLDAPSettings)
-
+print(json.dumps(currentLDAPSettings, indent=4))
