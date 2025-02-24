@@ -61,14 +61,14 @@ print('Host groups:');pprint(hostGroups);print()
 
 userGroupNames = set()
 
+# Read "User group" => "Host permissions" mapping into memory
+with open("User_groups_Host_permissions_map.csv", 'rt') as f:
+    User_groups_Host_permissions_map = list(csv.DictReader(f))  # Convert to a list for immediate use
 
-# read the future "User group" => "Host permissions" mapping into memory
-User_groups_Host_permissions_map_csv = open("User_groups_Host_permissions_map.csv",'rt')
-User_groups_Host_permissions_map = csv.DictReader( User_groups_Host_permissions_map_csv )
+# Read "User group" => "Template permissions" mapping into memory
+with open("User_groups_Template_permissions_map.csv", 'rt') as f:
+    User_groups_Template_permissions_map = list(csv.DictReader(f))
 
-# read the future "User group" => "Template permissions" mapping into memory
-User_groups_Template_permissions_map_csv = open("User_groups_Template_permissions_map.csv",'rt')
-User_groups_Template_permissions_map = csv.DictReader( User_groups_Template_permissions_map_csv )
 
 # 1.0 file structure validation
 #   if file contains '\' symbol then exit program. highlight cell
@@ -129,11 +129,12 @@ for new_tg in User_groups_Template_permissions_map:
             print('Creating template group \"'+new_tg['Template group']+'\" now..')
         else:
             print('Need to create \"'+new_tg['Template group']+'\" but no flag was given. Use -t to create missing template groups automatically')
+print()
 
 print('unique user groups to work with: ')
 userGroupNames = list(userGroupNames)
 pprint(userGroupNames)
-
+print()
 # 2.2 read line per hosts_map csv
 # validate if host group exists
 #   if not exist then:
@@ -146,32 +147,54 @@ pprint(userGroupNames)
 
 
 # 3.0 rerun hostgroup.get and templategroup.get API call to ensure more groups exist
-# pick up "Template groups"
-templateGroups = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
-    {"jsonrpc":"2.0","method":"templategroup.get","params":{"output":["groupid","name"]},"id":1}
-    ), verify=False).text))[0].value
+# if there was a flag given to recreate template groups automatically, then pick up all "Template groups" again
+if templateGroupCreate:
+    templateGroups = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
+        {"jsonrpc":"2.0","method":"templategroup.get","params":{"output":["groupid","name"]},"id":1}
+        ), verify=False).text))[0].value
 
-# pick up "Host groups"
-hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
-    {"jsonrpc":"2.0","method":"hostgroup.get","params":{"output":["groupid","name"]},"id":1}
-    ), verify=False).text))[0].value
-
-# 0 - access denied;
-# 2 - read-only access;
-# 3 - read-write access.
-
-# extract all unique user group role names:
-#userGroupNames = []
-#print(User_groups_Host_permissions_map)
+# if there was a flag given to recreate host groups automatically then pick up all "Host groups" again
+if hostGroupCreate:
+    hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
+        {"jsonrpc":"2.0","method":"hostgroup.get","params":{"output":["groupid","name"]},"id":1}
+        ), verify=False).text))[0].value
 
 
-#for line in User_groups_Template_permissions_map:
- #   print(line['User group'])
+
+# read all unique user groups
+for ug in userGroupNames:
+
+    # if group name is listed in templates permissions file
+    for hg in User_groups_Host_permissions_map:
+        if ug == hg['User group']:
+            print(hg['User group']+' exists in hosts permissions file')
+
+
+
+
+
+    # if group name is listed in hosts permissions file
+    for tg in User_groups_Template_permissions_map:
+        if ug == tg['User group']:
+            print(hg['User group']+' exists in templates permissions file')
+
 
 # 4.0 read both "csv" lists and seek for a matching "user role"
 #   prepare API update operation
 #     reset array "hostgroup_rights"
 #     reset array "templategroup_rights"
+# 0 - access denied;
+# 2 - read-only access;
+# 3 - read-write access.
+
+
+
+
+
+
+
+
+
 
 # 5.0 
 # if template group and host group exists then
