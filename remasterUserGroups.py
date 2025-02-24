@@ -14,6 +14,26 @@ urllib3.disable_warnings()
 url = config.api_jsonrpc
 token = config.api_token
 
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    '-t', '--templateGroupCreate',
+    help='flag to create template group if it does not exist, default: False',
+    action='store_true'
+)
+parser.add_argument(
+    '-o', '--hostGroupCreate',
+    help='flag to create host group if it does not exist, default: False',
+    action='store_true'
+)
+
+args = parser.parse_args()
+
+templateGroupCreate = args.templateGroupCreate
+hostGroupCreate = args.hostGroupCreate
+
+
 # define token in header
 headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer '+token}
 
@@ -37,7 +57,32 @@ hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, hea
     {"jsonrpc":"2.0","method":"hostgroup.get","params":{"output":["groupid","name"]},"id":1}
     ), verify=False).text))[0].value
 print('Host groups:');pprint(hostGroups);print()
-# importing CSV into memory
-#file = open("user_group_templates.csv",'rt')
-#reader = csv.DictReader( file )
+
+
+# read "user group" => "host group" mapping into memory
+hosts_map_csv = open("user_group_hosts.csv",'rt')
+hosts_map = csv.DictReader( hosts_map_csv )
+
+# read "user group" => "template group" mapping into memory
+templates_map_csv = open("user_group_templates.csv",'rt')
+templates_map = csv.DictReader( templates_map_csv )
+
+# file validation
+#  
+
+# read line
+# validate if template group exist
+# validate if host group exists
+#   if not exist then:
+#     create new host group
+# rerun hostgroup get API call to ensure more groups exist
+# empty/reset array "hostgroup_rights"
+# empty/reset array "templategroup_rights"
+# if template group and host group exists then
+#   validate if user group with such name exist
+#     if exist then:
+#       read user group id
+#       use "usergroup.update" API method to overwrite settings with new definition in csv
+#     else:
+#       use "usergroup.create" API method to create new group
 
