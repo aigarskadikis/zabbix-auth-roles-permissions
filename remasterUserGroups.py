@@ -67,17 +67,40 @@ hosts_map = csv.DictReader( hosts_map_csv )
 templates_map_csv = open("user_group_templates.csv",'rt')
 templates_map = csv.DictReader( templates_map_csv )
 
-# file validation
-#  
+# 1.0 file structure validation
 
-# read line
+# 2.0 create missing host/template groups if allowed by program
+# 2.1 read line per templates_map csv
 # validate if template group exist
+#   if not exist
+#     check flag to create template group
+#     if flag=yes:
+#       create new template group
+#     else:
+#       do nothina
+# 2.1.1 backtrack if all nested groups has been made
+#   read every group name and scan '/' symbol
+#     if found then cut right portion away and search if such group exists
+#     if not exists then create a blank group
+
+# 2.2 read line per hosts_map csv
 # validate if host group exists
 #   if not exist then:
 #     create new host group
-# rerun hostgroup get API call to ensure more groups exist
-# empty/reset array "hostgroup_rights"
-# empty/reset array "templategroup_rights"
+
+# 2.2.1 backtrack if all nested groups has been made
+#   read every group name and scan '/' symbol
+#     if found then cut right portion away and search if such group exists
+#     if not exists then create a blank group
+
+
+# 3.0 rerun hostgroup get API call to ensure more groups exist
+
+# 4.0 prepare API update operation
+# reset array "hostgroup_rights"
+# reset array "templategroup_rights"
+
+# 5.0 
 # if template group and host group exists then
 #   validate if user group with such name exist
 #     if exist then:
@@ -85,4 +108,6 @@ templates_map = csv.DictReader( templates_map_csv )
 #       use "usergroup.update" API method to overwrite settings with new definition in csv
 #     else:
 #       use "usergroup.create" API method to create new group
+
+
 
