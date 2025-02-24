@@ -257,6 +257,15 @@ for ug in userGroupNames:
 
     else:
         print('Need to create new User group: '+ug)
+        if len(hostgroup_rights)>0 and len(templategroup_rights)>0:
+            print(json.dumps({"jsonrpc":"2.0","method":"usergroup.create","params":{"name":ug,"hostgroup_rights":hostgroup_rights,"templategroup_rights":templategroup_rights},"id":1},indent=4, default=str))
+
+            createNewUG = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"usergroup.create","params":{
+                "name":ug,
+                "hostgroup_rights":hostgroup_rights,
+                "templategroup_rights":templategroup_rights
+                },"id":1}), verify=False).text))[0].value
+
 
 
 # 5.0
