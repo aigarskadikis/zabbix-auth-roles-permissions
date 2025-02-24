@@ -33,6 +33,16 @@ args = parser.parse_args()
 templateGroupCreate = args.templateGroupCreate
 hostGroupCreate = args.hostGroupCreate
 
+# Define the mapping
+permission = {
+    "Deny": 0,
+    "Read": 2,
+    "Write": 3,
+    "deny": 0,
+    "read": 2,
+    "write": 3
+}
+
 
 # define token in header
 headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer '+token}
@@ -160,23 +170,45 @@ if hostGroupCreate:
         ), verify=False).text))[0].value
 
 
+# One time supply with group ID for host CSV inputs
+for hg_csv in User_groups_Host_permissions_map:
+    for hg_ins in hostGroups:
+        if hg_csv['Host group'] == hg_ins['name']:
+            hg_csv["id"] = hg_ins['groupid']
+            hg_csv["permission"] = permission.get(hg_csv["Permission"],99)
+
+# One time supply with group ID for templates CSV inputs
+for tg_csv in User_groups_Template_permissions_map:
+    for tg_ins in templateGroups:
+        if tg_csv['Template group'] == tg_ins['name']:
+            tg_csv["id"] = tg_ins['groupid']
+            tg_csv["permission"] = permission.get(tg_csv["Permission"],99)
+
+pprint(User_groups_Host_permissions_map)
+pprint(User_groups_Template_permissions_map)
 
 # read all unique user groups
 for ug in userGroupNames:
 
+    # reset array "hostgroup_rights"
+    hostgroup_rights = []
+    # reset array "templategroup_rights"
+    templategroup_rights = []
+
     # if group name is listed in templates permissions file
-    for hg in User_groups_Host_permissions_map:
-        if ug == hg['User group']:
-            print(hg['User group']+' exists in hosts permissions file')
+#    for hg in User_groups_Host_permissions_map:
+ #       if ug == hg['User group']:
+  #          print(hg['User group']+' exists in hosts permissions file')
+   #         hostgroup_rights.append({"id":id,"permission":permission})
 
 
 
 
 
     # if group name is listed in hosts permissions file
-    for tg in User_groups_Template_permissions_map:
-        if ug == tg['User group']:
-            print(hg['User group']+' exists in templates permissions file')
+#    for tg in User_groups_Template_permissions_map:
+ #       if ug == tg['User group']:
+  #          print(hg['User group']+' exists in templates permissions file')
 
 
 # 4.0 read both "csv" lists and seek for a matching "user role"
@@ -191,19 +223,13 @@ for ug in userGroupNames:
 
 
 
+# 5.0
+# read all unqieu user group names
+#   if user group does not exist then
+#     creta new user group. usergroup.create
+#   else:
+#     update existing. usergroup.update
 
-
-
-
-
-# 5.0 
-# if template group and host group exists then
-#   validate if user group with such name exist
-#     if exist then:
-#       read user group id
-#       use "usergroup.update" API method to overwrite settings with new definition in csv
-#     else:
-#       use "usergroup.create" API method to create new group
 
 
 
