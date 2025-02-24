@@ -59,15 +59,18 @@ hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, hea
 print('Host groups:');pprint(hostGroups);print()
 
 
-# read "user group" => "host group" mapping into memory
-hosts_map_csv = open("user_group_hosts.csv",'rt')
-hosts_map = csv.DictReader( hosts_map_csv )
+# read the future "User group" => "Host permissions" mapping into memory
+User_groups_Host_permissions_map_csv = open("User_groups_Host_permissions_map.csv",'rt')
+User_groups_Host_permissions_map = csv.DictReader( User_groups_Host_permissions_map_csv )
 
-# read "user group" => "template group" mapping into memory
-templates_map_csv = open("user_group_templates.csv",'rt')
-templates_map = csv.DictReader( templates_map_csv )
+# read the future "User group" => "Template permissions" mapping into memory
+User_groups_Template_permissions_map_csv = open("User_groups_Template_permissions_map.csv",'rt')
+User_groups_Template_permissions_map = csv.DictReader( User_groups_Template_permissions_map_csv )
 
 # 1.0 file structure validation
+#   if file contains '\' symbol then exit program. highlight cell
+#   if one of cells has trailing or leading space, then exist program, but highlight the cell
+# allow characters per cell are'[a-zA-Z0-9]
 
 # 2.0 create missing host/template groups if allowed by program
 # 2.1 read line per templates_map csv
@@ -83,6 +86,43 @@ templates_map = csv.DictReader( templates_map_csv )
 #     if found then cut right portion away and search if such group exists
 #     if not exists then create a blank group
 
+# go through host group csv
+for new_hg in User_groups_Host_permissions_map:
+    # host group not recognized yet
+    hg_exist = 0
+    # go through existing
+    for ins_hg in hostGroups:
+        if new_hg['Host group'] == ins_hg['name']:
+            # mask host group as found
+            hg_exist = 1
+            break
+
+    # if host group was never found
+    if not hg_exist:
+        if hostGroupCreate:
+            print('Creating host group \"'+new_hg['Host group']+'\" now..')
+        else:
+            print('Need to create \"'+new_hg['Host group']+'\" but no flag was given. Use -o to create missing host groups automatically')
+
+print()
+
+for new_tg in User_groups_Template_permissions_map:
+    # template group not recognized yet
+    tg_exist = 0
+    # go through existing
+    for ins_tg in templateGroups:
+        if new_tg['Template group'] == ins_tg['name']:
+            # mask template group as found
+            tg_exist = 1
+            break
+
+    # if template group was never found
+    if not tg_exist:
+        if templateGroupCreate:
+            print('Creating template group \"'+new_tg['Template group']+'\" now..')
+        else:
+            print('Need to create \"'+new_tg['Template group']+'\" but no flag was given. Use -t to create missing template groups automatically')
+
 # 2.2 read line per hosts_map csv
 # validate if host group exists
 #   if not exist then:
@@ -96,9 +136,10 @@ templates_map = csv.DictReader( templates_map_csv )
 
 # 3.0 rerun hostgroup get API call to ensure more groups exist
 
-# 4.0 prepare API update operation
-# reset array "hostgroup_rights"
-# reset array "templategroup_rights"
+# 4.0 read both "csv" lists and seek for a matching "user role"
+#   prepare API update operation
+#     reset array "hostgroup_rights"
+#     reset array "templategroup_rights"
 
 # 5.0 
 # if template group and host group exists then

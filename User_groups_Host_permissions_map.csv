@@ -4,6 +4,6 @@ Windows sysadmins,Windows servers,write
 Helpdesk operators,Linux servers,read
 Helpdesk operators,Windows servers,read
 Network team,Network devices,read
-MS SQL admins,Templates/DB/MS SQL,write
-Database admins,Templates/DB,read
-Linux sysadmins,Templates/LNX/OS,write
+MS SQL admins,DB/MS SQL,write
+Database admins,DB,read
+Linux sysadmins,LNX/OS,write
