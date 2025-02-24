@@ -59,6 +59,9 @@ hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, hea
 print('Host groups:');pprint(hostGroups);print()
 
 
+userGroupNames = set()
+
+
 # read the future "User group" => "Host permissions" mapping into memory
 User_groups_Host_permissions_map_csv = open("User_groups_Host_permissions_map.csv",'rt')
 User_groups_Host_permissions_map = csv.DictReader( User_groups_Host_permissions_map_csv )
@@ -88,6 +91,8 @@ User_groups_Template_permissions_map = csv.DictReader( User_groups_Template_perm
 
 # go through host group csv
 for new_hg in User_groups_Host_permissions_map:
+    # filter out unique names (this is not related to main cycle)
+    userGroupNames.add(new_hg['User group'])
     # host group not recognized yet
     hg_exist = 0
     # go through existing
@@ -107,6 +112,8 @@ for new_hg in User_groups_Host_permissions_map:
 print()
 
 for new_tg in User_groups_Template_permissions_map:
+    # filter out unique names (this is not related to main cycle)
+    userGroupNames.add(new_tg['User group'])
     # template group not recognized yet
     tg_exist = 0
     # go through existing
@@ -123,6 +130,10 @@ for new_tg in User_groups_Template_permissions_map:
         else:
             print('Need to create \"'+new_tg['Template group']+'\" but no flag was given. Use -t to create missing template groups automatically')
 
+print('unique user groups to work with: ')
+userGroupNames = list(userGroupNames)
+pprint(userGroupNames)
+
 # 2.2 read line per hosts_map csv
 # validate if host group exists
 #   if not exist then:
@@ -134,7 +145,28 @@ for new_tg in User_groups_Template_permissions_map:
 #     if not exists then create a blank group
 
 
-# 3.0 rerun hostgroup get API call to ensure more groups exist
+# 3.0 rerun hostgroup.get and templategroup.get API call to ensure more groups exist
+# pick up "Template groups"
+templateGroups = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
+    {"jsonrpc":"2.0","method":"templategroup.get","params":{"output":["groupid","name"]},"id":1}
+    ), verify=False).text))[0].value
+
+# pick up "Host groups"
+hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
+    {"jsonrpc":"2.0","method":"hostgroup.get","params":{"output":["groupid","name"]},"id":1}
+    ), verify=False).text))[0].value
+
+# 0 - access denied;
+# 2 - read-only access;
+# 3 - read-write access.
+
+# extract all unique user group role names:
+#userGroupNames = []
+#print(User_groups_Host_permissions_map)
+
+
+#for line in User_groups_Template_permissions_map:
+ #   print(line['User group'])
 
 # 4.0 read both "csv" lists and seek for a matching "user role"
 #   prepare API update operation

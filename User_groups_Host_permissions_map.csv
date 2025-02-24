@@ -7,3 +7,4 @@ Network team,Network devices,read
 MS SQL admins,DB/MS SQL,write
 Database admins,DB,read
 Linux sysadmins,LNX/OS,write
+UserG without template access,View only,read
