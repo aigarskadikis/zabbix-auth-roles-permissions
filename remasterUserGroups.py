@@ -195,7 +195,7 @@ for ug in userGroupNames:
     # reset array "templategroup_rights"
     templategroup_rights = []
 
-    # if group name is listed in templates permissions file
+    # if group name is listed in hosts permissions file, then read line (host group, permission level) and add to bulk update
     for hg in User_groups_Host_permissions_map:
         if ug == hg['User group']:
             print(hg['User group']+' exists in hosts permissions file')
@@ -208,25 +208,55 @@ for ug in userGroupNames:
     pprint(hostgroup_rights)
 
 
+    # if group name is listed in templates permissions file, then read line (template group, permission level) and add to bulk update
+    for tg in User_groups_Template_permissions_map:
+        if ug == tg['User group']:
+            print(tg['User group']+' exists in templates permissions file')
+            if 'id' in tg and 'permission' in tg:
+                templategroup_rights.append({
+                    "id":tg['id'],
+                    "permission":tg['permission']
+                    })
+
+    pprint(templategroup_rights)
 
 
 
-    # if group name is listed in hosts permissions file
-#    for tg in User_groups_Template_permissions_map:
- #       if ug == tg['User group']:
-  #          print(hg['User group']+' exists in templates permissions file')
+    # check if this is fresh user group
+    user_group_exist = 0
+    for existing_ug in userGroups:
+        if ug == existing_ug['name']:
+            user_group_exist = 1
+            break
+
+    ug_to_update = 0
+    if user_group_exist:
+        print('User group already exist: '+ug)
+
+        # read existing ID of user group
+        for existing_ug in userGroups:
+            if existing_ug['name'] == ug:
+                ug_to_update = existing_ug['usrgrpid']
+
+        print('user group to update: '+ug_to_update)
+
+        pprint(json.dumps({"jsonrpc":"2.0","method":"usergroup.update","params":{"usrgrpid":ug_to_update,"hostgroup_rights":hostgroup_rights,"templategroup_rights":templategroup_rights},"id":1}))
+
+        if len(hostgroup_rights)>0 and len(templategroup_rights)>0:
+            print('match')
+            updateOperation = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
+                {"jsonrpc":"2.0","method":"usergroup.update","params":{
+                "usrgrpid":ug_to_update,
+                "hostgroup_rights":hostgroup_rights,
+                "templategroup_rights":templategroup_rights
+                },"id":1}), verify=False).text))[0].value
+
+            pprint(updateOperation)
 
 
-# 4.0 read both "csv" lists and seek for a matching "user role"
-#   prepare API update operation
-#     reset array "hostgroup_rights"
-#     reset array "templategroup_rights"
-# 0 - access denied;
-# 2 - read-only access;
-# 3 - read-write access.
 
-
-
+    else:
+        print('Need to create new User group: '+ug)
 
 
 # 5.0
