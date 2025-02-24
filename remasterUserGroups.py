@@ -196,10 +196,16 @@ for ug in userGroupNames:
     templategroup_rights = []
 
     # if group name is listed in templates permissions file
-#    for hg in User_groups_Host_permissions_map:
- #       if ug == hg['User group']:
-  #          print(hg['User group']+' exists in hosts permissions file')
-   #         hostgroup_rights.append({"id":id,"permission":permission})
+    for hg in User_groups_Host_permissions_map:
+        if ug == hg['User group']:
+            print(hg['User group']+' exists in hosts permissions file')
+            if 'id' in hg and 'permission' in hg:
+                hostgroup_rights.append({
+                    "id":hg['id'],
+                    "permission":hg['permission']
+                    })
+
+    pprint(hostgroup_rights)
 
 
 
