@@ -68,7 +68,7 @@ hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, hea
     ), verify=False).text))[0].value
 print('Host groups:');pprint(hostGroups);print()
 
-
+# a variable to hold unique user group names
 userGroupNames = set()
 
 # Read "User group" => "Host permissions" mapping into memory
@@ -78,26 +78,6 @@ with open("User_groups_Host_permissions_map.csv", 'rt') as f:
 # Read "User group" => "Template permissions" mapping into memory
 with open("User_groups_Template_permissions_map.csv", 'rt') as f:
     User_groups_Template_permissions_map = list(csv.DictReader(f))
-
-
-# 1.0 file structure validation
-#   if file contains '\' symbol then exit program. highlight cell
-#   if one of cells has trailing or leading space, then exist program, but highlight the cell
-# allow characters per cell are'[a-zA-Z0-9]
-
-# 2.0 create missing host/template groups if allowed by program
-# 2.1 read line per templates_map csv
-# validate if template group exist
-#   if not exist
-#     check flag to create template group
-#     if flag=yes:
-#       create new template group
-#     else:
-#       do nothina
-# 2.1.1 backtrack if all nested groups has been made
-#   read every group name and scan '/' symbol
-#     if found then cut right portion away and search if such group exists
-#     if not exists then create a blank group
 
 # go through host group csv
 for new_hg in User_groups_Host_permissions_map:
@@ -116,6 +96,9 @@ for new_hg in User_groups_Host_permissions_map:
     if not hg_exist:
         if hostGroupCreate:
             print('Creating host group \"'+new_hg['Host group']+'\" now..')
+            createNewHostGroup = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"hostgroup.create","params":{"name":new_hg['Host group']},"id":1}), verify=False).text))[0].value
+            print('New host groups:');pprint(createNewHostGroup);print()
+
         else:
             print('Need to create \"'+new_hg['Host group']+'\" but no flag was given. Use -o to create missing host groups automatically')
 
@@ -137,6 +120,8 @@ for new_tg in User_groups_Template_permissions_map:
     if not tg_exist:
         if templateGroupCreate:
             print('Creating template group \"'+new_tg['Template group']+'\" now..')
+            createNewTemplateGroup = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"templategroup.create","params":{"name":new_tg['Template group']},"id":1}), verify=False).text))[0].value
+            print('New template groups:');pprint(createNewTemplateGroup);print()
         else:
             print('Need to create \"'+new_tg['Template group']+'\" but no flag was given. Use -t to create missing template groups automatically')
 print()
