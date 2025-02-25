@@ -70,6 +70,8 @@ print('Host groups:');pprint(hostGroups);print()
 
 # a variable to hold unique user group names
 userGroupNames = set()
+madeNewTemplateGroups = set()
+madeNewHostGroups = set()
 
 # Read "User group" => "Host permissions" mapping into memory
 with open("User_groups_Host_permissions_map.csv", 'rt') as f:
@@ -82,6 +84,7 @@ with open("User_groups_Template_permissions_map.csv", 'rt') as f:
 # go through host group csv
 for new_hg in User_groups_Host_permissions_map:
     # filter out unique names (this is not related to main cycle)
+    print(new_hg['User group'])
     userGroupNames.add(new_hg['User group'])
     # host group not recognized yet
     hg_exist = 0
@@ -94,9 +97,12 @@ for new_hg in User_groups_Host_permissions_map:
 
     # if host group was never found
     if not hg_exist:
-        if hostGroupCreate:
+        if hostGroupCreate and new_hg['Host group'] not in madeNewHostGroups:
             print('Creating host group \"'+new_hg['Host group']+'\" now..')
             createNewHostGroup = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"hostgroup.create","params":{"name":new_hg['Host group']},"id":1}), verify=False).text))[0].value
+            # blindly assume the api call was successfull
+            madeNewHostGroups.add(new_hg['Host group'])
+
             print('New host groups:');pprint(createNewHostGroup);print()
 
         else:
@@ -118,9 +124,10 @@ for new_tg in User_groups_Template_permissions_map:
 
     # if template group was never found
     if not tg_exist:
-        if templateGroupCreate:
+        if templateGroupCreate and new_tg['Template group'] not in madeNewTemplateGroups:
             print('Creating template group \"'+new_tg['Template group']+'\" now..')
             createNewTemplateGroup = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"templategroup.create","params":{"name":new_tg['Template group']},"id":1}), verify=False).text))[0].value
+            madeNewTemplateGroups.add(new_tg['Template group'])
             print('New template groups:');pprint(createNewTemplateGroup);print()
         else:
             print('Need to create \"'+new_tg['Template group']+'\" but no flag was given. Use -t to create missing template groups automatically')
@@ -228,7 +235,6 @@ for ug in userGroupNames:
         pprint(json.dumps({"jsonrpc":"2.0","method":"usergroup.update","params":{"usrgrpid":ug_to_update,"hostgroup_rights":hostgroup_rights,"templategroup_rights":templategroup_rights},"id":1}))
 
         if len(hostgroup_rights)>0 and len(templategroup_rights)>0:
-            print('match')
             updateOperation = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
                 {"jsonrpc":"2.0","method":"usergroup.update","params":{
                 "usrgrpid":ug_to_update,
@@ -236,20 +242,46 @@ for ug in userGroupNames:
                 "templategroup_rights":templategroup_rights
                 },"id":1}), verify=False).text))[0].value
 
+        if len(hostgroup_rights)>0 and len(templategroup_rights) == 0:
+            updateOperation = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
+                {"jsonrpc":"2.0","method":"usergroup.update","params":{
+                "usrgrpid":ug_to_update,
+                "hostgroup_rights":hostgroup_rights
+                },"id":1}), verify=False).text))[0].value
+
+        if len(hostgroup_rights) == 0 and len(templategroup_rights) > 0:
+            updateOperation = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
+                {"jsonrpc":"2.0","method":"usergroup.update","params":{
+                "usrgrpid":ug_to_update,
+                "templategroup_rights":templategroup_rights
+                },"id":1}), verify=False).text))[0].value
+
             pprint(updateOperation)
-
-
 
     else:
         print('Need to create new User group: '+ug)
         if len(hostgroup_rights)>0 and len(templategroup_rights)>0:
             print(json.dumps({"jsonrpc":"2.0","method":"usergroup.create","params":{"name":ug,"hostgroup_rights":hostgroup_rights,"templategroup_rights":templategroup_rights},"id":1},indent=4, default=str))
-
             createNewUG = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"usergroup.create","params":{
                 "name":ug,
                 "hostgroup_rights":hostgroup_rights,
                 "templategroup_rights":templategroup_rights
                 },"id":1}), verify=False).text))[0].value
+
+        if len(hostgroup_rights)>0 and len(templategroup_rights) == 0:
+            createNewUG = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"usergroup.create","params":{
+                "name":ug,
+                "hostgroup_rights":hostgroup_rights
+                },"id":1}), verify=False).text))[0].value
+
+        if len(hostgroup_rights) == 0 and len(templategroup_rights)>0:
+            createNewUG = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps({"jsonrpc":"2.0","method":"usergroup.create","params":{
+                "name":ug,
+                "templategroup_rights":templategroup_rights
+                },"id":1}), verify=False).text))[0].value
+
+        pprint(createNewUG)
+
 
 
 
