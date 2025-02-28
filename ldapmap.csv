@@ -1,6 +1,0 @@
-LDAP group pattern,User groups,User role
-zbx_admins,Zabbix administrators,Super admin role
-lnx_admins,Linux sysadmins,Admin role
-win_admins,Windows sysadmins,Admin role
-ora_admins,Oracle administrators,Admin role
-db_admins,DB administrators,Admin role

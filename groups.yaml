@@ -1,0 +1,7 @@
+Linux-system-administrators:
+  prefix: it/lnx
+Windows-system-administrators:
+  prefix: it/win
+Oracle-DB-admins:
+  prefix: it/oracle
+

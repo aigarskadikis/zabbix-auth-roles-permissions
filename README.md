@@ -1,14 +1,32 @@
 # LDAP mapping, user/host group mapping
 
-Manage LDAP mapping, user/host group mapping for Zabbix 7.2
+* This is a solution for company where one goal == one dream
+* host group, template group, user group will use same prefix/pattern
+* All teams will have read only access to other teams to view all events and graphs
+* Each team itself will have writeable access to all host objects it belongs to it (host, template) group
+* Write access will be also to template group which belong to team
+* LDAP mapping will be base on a custom pattern
 
-## Goal/functionality
+## YAML example
 
-* Manage permissions, group mapping completely outside Zabbix GUI
-* Mostly user type "Zabbix Admin" will be used for user role. This allows flexibility for certain objects (hosts, templates) to be read only or write ready
-* Script will create missing host groups automatically
-* If template groups does not exist, then user group will not have access to templates.
-* Allows to reconfigure LDAP mapping
+```yaml
+Linux-system-administrators:
+  prefix: it/lnx
+Windows-system-administrators:
+  prefix: it/win
+Oracle-DB-admins:
+  prefix: it/oracle
+```
+
+## Outcome
+
+![hg](./img/host-group-names.png)
+![tg](./img/tamplate-group-names.png)
+![ug](./img/user-group-names.png)
+![ug](./img/write-access.png)
+![ldap](./img/ldap1.png)
+![ldap](./img/ldap-mapping.png)
+
 
 ## Tested and works with
 
@@ -48,47 +66,21 @@ chmod +x *.py
 ```
 
 
-## Install API access characteristics
-
-Create directory
-```
-mkdir -p /var/lib/zabbix
-```
-
-Configure frontend URL and API token 
-```
-echo "
-api_jsonrpc = 'http://127.0.0.1/api_jsonrpc.php'
-api_token = '814112f276f029a23e423e8f27ce4599d21934f11cc50de13553f3b1c3ff4e1c'
-" | sudo tee /var/lib/zabbix/config.py
-```
-
 ## List existing LDAP settings
 
-list existing LDAP mapping
+Recreate groups based on YAML
 ```
-./listMappingLDAP.py
-```
-
-## create new LDAP mapping based on CSV
-
-Create ldapmap.csv with contents:
-```
-LDAP group pattern,User groups,User role
-zbx_admins,Zabbix administrators,Super admin role
-lnx_admins,Linux sysadmins,Admin role
-win_admins,Windows sysadmins,Admin role
-ora_admins,Oracle administrators,Admin role
-db_admins,DB administrators,Admin role
+./groups.py \
+--api_jsonrpc http://127.0.0.1/api_jsonrpc.php \
+--token 814112f276f029a23e423e8f27ce4599d21934f11cc50de13553f3b1c3ff4e1c \
+--host 'ldap.lan' \
+--port 389 \
+--base_dn 'OU=Users,DC=ldap,DC=lan' \
+--bind_dn 'CN=Service Accounts,DC=ldap,DC=lan' \
+--bind_password 'BIND_PASSWORD'
 ```
 
-This will administer the position:
 
-![ldap-map](./img/ldapmap.png)
 
-run:
-```
-./updateMappingLDAP.py
-```
 
 

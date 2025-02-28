@@ -1,9 +1,0 @@
-User group,Template group,Permission
-Server admins,Templates/Operating systems,read
-Network team,Network devices,read
-MS SQL admins,Templates/DB/MS SQL,write
-Database admins,Templates/DB,read
-Linux sysadmins,Templates/LNX/OS,write
-Outsourced monitoring architect,Templates,write
-Windows sysadmins,Templates/win,write
-Helpdesk operators,Templates,read
