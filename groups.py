@@ -142,7 +142,7 @@ for ldap, values in data.items():
             ug_exist = 1
             break
 
-    # next 2 block prepare ideal structure (not too much, just exact amount of permissions) of user group
+    # next 2 block prepare ideal structure (just exact amount of permissions) of user group
 
     # locate host group ID which it will need write access
     for hg in hostGroups:
@@ -164,8 +164,8 @@ for ldap, values in data.items():
         else:
             # check if list of template groups in Zabbix exist in YAML
             for ldap_rescan, prefix_rescan in data.items():
-                if prefix_rescan['prefix'] == tg['name']:
-                    templategroup_rights.append({"id":tg['groupid'],"permission":""})
+                if 'templates/'+prefix_rescan['prefix'] == tg['name']:
+                    templategroup_rights.append({"id":tg['groupid'],"permission":"2"})
 
     # will create new or edit existing
 
@@ -187,7 +187,7 @@ for ldap, values in data.items():
         if prefix == ug['name']:
             existing_hostgroup_rights = ug['hostgroup_rights']
             existing_templategroup_rights = ug['templategroup_rights']
-            if sorted(existing_hostgroup_rights, key=lambda x: x['id']) == sorted(hostgroup_rights, key=lambda x: x['id']):
+            if (sorted(existing_hostgroup_rights, key=lambda x: x['id']) == sorted(hostgroup_rights, key=lambda x: x['id'])) and (sorted(existing_templategroup_rights, key=lambda x: x['id']) == sorted(templategroup_rights, key=lambda x: x['id'])):
                 print('desired structure for user group \"'+prefix+'\" is OK')
             else:
                 print('something is off with user group \"'+prefix+'\", need to remaster it')

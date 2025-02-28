@@ -23,7 +23,8 @@ Oracle-DB-admins:
 ![hg](./img/host-group-names.png)
 ![tg](./img/tamplate-group-names.png)
 ![ug](./img/user-group-names.png)
-![ug](./img/write-access.png)
+![ug](./img/write-access-hosts.png)
+![ug](./img/write-access-templates.png)
 ![ldap](./img/ldap1.png)
 ![ldap](./img/ldap-mapping.png)
 
