@@ -1,6 +1,6 @@
 # LDAP mapping, user/host group mapping
 
-* This is a solution for company where one goal == one dream
+* This is a solution for Zabbix where one company == one goal == one dream
 * host group, template group, user group will use same prefix/pattern
 * All teams will have read only access to other teams to view all events and graphs
 * Each team itself will have writeable access to all host objects it belongs to it (host, template) group
