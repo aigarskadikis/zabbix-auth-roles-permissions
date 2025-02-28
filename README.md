@@ -3,8 +3,8 @@
 * This is a solution for Zabbix where one company == one goal == one dream
 * host group, template group, user group will use same prefix/pattern
 * All teams will have read only access to other teams to view all events and graphs
-* Each team itself will have writeable access to all host objects it belongs to it (host, template) group
-* Write access will be also to template group which belong to team
+* Each team itself will have writeable access to all host objects it belongs to their host, template group
+* Write access will be to host/template group which belong to team
 * LDAP mapping will be base on a custom pattern
 
 ## YAML example
