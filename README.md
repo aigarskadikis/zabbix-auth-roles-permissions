@@ -82,6 +82,24 @@ Recreate groups based on YAML
 ```
 
 Example 2
+
+put location of "dc" in hosts file
+```
+grep dc /etc/passwd
+```
+
+test ldap connection:
+```
+ldapsearch -x \
+-H ldap://dc:389 \
+-D "CN=zbxldap,OU=Service users,DC=custom,DC=lan" \
+-W \
+-b "OU=Domain users,DC=custom,DC=lan" \
+-s sub "(sAMAccountName=*)" dn
+```
+
+
+Run script:
 ```
 python3.9 70.py \
 --api_jsonrpc 'https://127.0.0.1:44370/api_jsonrpc.php' \
