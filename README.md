@@ -85,7 +85,7 @@ Example 2
 
 put location of "dc" in hosts file
 ```
-grep dc /etc/passwd
+grep dc /etc/hosts
 ```
 
 test ldap connection:
