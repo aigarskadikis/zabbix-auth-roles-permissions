@@ -31,8 +31,8 @@ Oracle-DB-admins:
 
 ## Tested and works with
 
-* Python 3.10
-* Zabbix 7.2.3
+* Python 3.10, 3.9
+* Zabbix 7.2.3, 7.0.9 (70.py)
 * Ubuntu 22.04
 
 ## Test frontend connection
