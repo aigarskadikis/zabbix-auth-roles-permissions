@@ -87,7 +87,7 @@ python3.9 70.py \
 --api_jsonrpc 'http://127.0.0.1/api_jsonrpc.php' \
 --token '814112f276f029a23e423e8f27ce4599d21934f11cc50de13553f3b1c3ff4e1c' \
 --host 'dc' \
---port '398' \
+--port '389' \
 --base_dn 'OU=Domain users,DC=custom,DC=lan' \
 --bind_dn 'CN=zbxldap,OU=Service users,DC=custom,DC=lan' \
 --bind_password 'Abc12345'

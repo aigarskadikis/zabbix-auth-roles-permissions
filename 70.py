@@ -342,11 +342,13 @@ else:
 
 # reset flags about authentification type
 # "disabled_usrgrpid": 9 is build in user group "Disabled"
+# https://www.zabbix.com/documentation/7.0/en/manual/api/reference/authentication/object
 resetFlags = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
     {
     "jsonrpc": "2.0",
     "method": "authentication.update",
     "params": {
+        "authentication_type": 1,
         "ldap_auth_enabled": 1,
         "ldap_case_sensitive": 0,
         "ldap_jit_status" : 1, 
