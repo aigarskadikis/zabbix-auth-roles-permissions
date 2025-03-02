@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.10
+#!/usr/bin/env python3.9
 import yaml
 
 
@@ -79,10 +79,7 @@ with open("groups.yaml", "r") as file:
 for ldap, values in data.items():
     prefix = values["prefix"]  # Extract the prefix value
 
-    #print('ldap group: '+ldap+' with a prefix: '+prefix)
-
-    # if host group does not exist
-    # reset flag
+    # by default host group does not exist
     hg_exist = 0
 
     # check all existing host groups
@@ -97,8 +94,8 @@ for ldap, values in data.items():
         createNewHostGroup = parse('$.result').find(json.loads(requests.request("POST", url, headers=headers, data=json.dumps(
             {"jsonrpc":"2.0","method":"hostgroup.create","params":{"name":prefix},"id":1}
             ), verify=False).text))[0].value
-
     
+    # by default template group does not exist
     tg_exist = 0
     for tg in templateGroups:
         if tg['name'] == 'templates/'+prefix:
@@ -124,7 +121,6 @@ hostGroups = parse('$.result').find(json.loads(requests.request("POST", url, hea
     ), verify=False).text))[0].value
 
 # iterate through same yaml loop, but this time a user group will be made
-# (which needs existing host and template groups to link)
 for ldap, values in data.items():
     prefix = values["prefix"]
 
@@ -140,7 +136,7 @@ for ldap, values in data.items():
             ug_exist = 1
             break
 
-    # next 2 block prepare ideal structure (just exact amount of permissions) of user group
+    # next 2 blocks prepare ideal structure (just exact amount of permissions) of user and template groups
 
     # locate host group ID which it will need write access
     for hg in hostGroups:
@@ -197,8 +193,6 @@ for ldap, values in data.items():
                 "templategroup_rights":templategroup_rights
                 },"id":1}), verify=False).text))[0].value
 
-
-
 # remaster LDAP settings
 
 # listing all user role IDs
@@ -215,17 +209,14 @@ currentLDAPSettings = parse('$.result').find(json.loads(requests.request("POST",
     {"jsonrpc":"2.0","method":"userdirectory.get","params":{"output":"extend","selectProvisionMedia":"extend","selectProvisionGroups":"extend"},"id":1}
     ), verify=False).text))[0].value
 
-# detect any LDAP settings
+# detect any preexisting LDAP settings
 ldapSettingsFound = 0
 for ldap in currentLDAPSettings:
-    print(ldap['idp_type'])
     if int(ldap['idp_type']) == int(1):
         ldapSettingsFound = 1
         provision_media = ldap['provision_media']
         userdirectoryid = ldap['userdirectoryid']
         name = ldap['name']
-
-print('ldapSettingsFound='+str(ldapSettingsFound))
 
 # prepare/define new object "provision_groups"
 provision_groups = []
@@ -236,17 +227,15 @@ for LDAP_group_pattern, group in data.items():
 
     print(LDAP_group_pattern)
 
-
     # go through all user groups to find and pick up an existing user group ID
     for ug in userGroups:
         if ug['name'] == prefix:
             provision_groups.append({"name":LDAP_group_pattern,"roleid":"2","user_groups":[{"usrgrpid":ug['usrgrpid']}]})
             break
 
-
 if ldapSettingsFound:
 
-
+    # if preexisting settings was found, then update them
     payload = {"jsonrpc":"2.0","method":"userdirectory.update","params": {
         "userdirectoryid": userdirectoryid,
         "name": host,
@@ -273,10 +262,8 @@ if ldapSettingsFound:
         }
         ,"id":1}
 
-
     print(json.dumps(payload, indent=4, default=str))
 
-    # update LDAP mapping
     try:
         response = requests.request(
             "POST", url, headers=headers, data=json.dumps(payload), verify=False
@@ -291,10 +278,8 @@ if ldapSettingsFound:
     except Exception as e:
         print("Error occurred:", str(e))
 
-
-
 else:
-
+    # creat new LDAP mapping
     payload = {"jsonrpc":"2.0","method":"userdirectory.create","params": {
         "idp_type": "1",
         "name": host,
@@ -321,10 +306,8 @@ else:
         }
         ,"id":1}
 
-
     print(json.dumps(payload, indent=4, default=str))
 
-    # update LDAP mapping
     try:
         response = requests.request(
             "POST", url, headers=headers, data=json.dumps(payload), verify=False

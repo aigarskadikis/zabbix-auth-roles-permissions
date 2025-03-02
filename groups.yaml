@@ -2,6 +2,6 @@ LinuxTeamWeTrust:
   prefix: it/lnx
 WindowsTeamWeTrust:
   prefix: it/win
-Oracle-DB-admins:
-  prefix: it/oracle
+MySQLAdministrators:
+  prefix: it/mysql
 
