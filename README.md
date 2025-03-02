@@ -84,8 +84,8 @@ Recreate groups based on YAML
 Example 2
 ```
 python3.9 70.py \
---api_jsonrpc 'http://127.0.0.1/api_jsonrpc.php' \
---token '814112f276f029a23e423e8f27ce4599d21934f11cc50de13553f3b1c3ff4e1c' \
+--api_jsonrpc 'https://127.0.0.1:44370/api_jsonrpc.php' \
+--token 'e4ca8af31d6c67e724bec411c23760d2867f96f327446d56ce9db2414c7871b1' \
 --host 'dc' \
 --port '389' \
 --base_dn 'OU=Domain users,DC=custom,DC=lan' \
