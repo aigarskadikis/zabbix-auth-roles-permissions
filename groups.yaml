@@ -1,6 +1,6 @@
-Linux-system-administrators:
+LinuxTeamWeTrust:
   prefix: it/lnx
-Windows-system-administrators:
+WindowsTeamWeTrust:
   prefix: it/win
 Oracle-DB-admins:
   prefix: it/oracle
