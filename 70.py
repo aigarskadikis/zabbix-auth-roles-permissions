@@ -1,7 +1,6 @@
 #!/usr/bin/env python3.9
 import yaml
 
-
 import json
 from jsonpath_ng import jsonpath, parse
 
@@ -15,25 +14,15 @@ urllib3.disable_warnings()
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    '--api_jsonrpc',
-    help='URL of Zabbix API php. for example: http://127.0.0.1/api_jsonrpc.php',
-    type=str,
-    required=True
-)
-parser.add_argument(
-    '--token',
-    help='API token. for example: 814112f276f029a23e423e8f27ce4599d21934f11cc50de13553f3b1c3ff4e1c',
-    type=str,
-    required=True
-)
+parser.add_argument('--api_jsonrpc',help="'https://127.0.0.1:44370/api_jsonrpc.php'",type=str,required=True)
+parser.add_argument('--token',help="'5d484770b8665f86cfeb615f952b98640a48c9764c7d5a1bc92979d9ad58e646'",type=str,required=True)
 
 # LDAP settings
-parser.add_argument('--host',help='ldap.lan',type=str,required=True)
-parser.add_argument('--port',help='389',type=str,required=True)
-parser.add_argument('--base_dn',help='OU=Users,DC=ldap,DC=lan',type=str,required=True)
-parser.add_argument('--bind_dn',help='CN=Service Accounts,DC=ldap,DC=lan',type=str,required=True)
-parser.add_argument('--bind_password',help='securePasswordHere',type=str,required=True)
+parser.add_argument('--host',help="'dc'",type=str,required=True)
+parser.add_argument('--port',help="'389'",type=str,required=True)
+parser.add_argument('--base_dn',help="'OU=Domain users,DC=custom,DC=lan'",type=str,required=True)
+parser.add_argument('--bind_dn',help="'CN=zbxldap,OU=Service users,DC=custom,DC=lan'",type=str,required=True)
+parser.add_argument('--bind_password',help="'Abc12345'",type=str,required=True)
 
 args = parser.parse_args()
 

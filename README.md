@@ -32,7 +32,7 @@ Oracle-DB-admins:
 ## Tested and works with
 
 * Python 3.10, 3.9
-* Zabbix 7.2.3, 7.0.9 (70.py)
+* Zabbix 7.2.3 (72.py), 7.0.9 (70.py)
 * Ubuntu 22.04
 
 ## Test frontend connection
@@ -67,21 +67,7 @@ chmod +x *.py
 ```
 
 
-## List existing LDAP settings
-
-Recreate groups based on YAML
-```
-./groups.py \
---api_jsonrpc http://127.0.0.1/api_jsonrpc.php \
---token 814112f276f029a23e423e8f27ce4599d21934f11cc50de13553f3b1c3ff4e1c \
---host 'ldap.lan' \
---port 389 \
---base_dn 'OU=Users,DC=ldap,DC=lan' \
---bind_dn 'CN=Service Accounts,DC=ldap,DC=lan' \
---bind_password 'BIND_PASSWORD'
-```
-
-Example 2
+## Recreate groups based on YAML
 
 put location of "dc" in hosts file
 ```
@@ -98,12 +84,23 @@ ldapsearch -x \
 -s sub "(sAMAccountName=*)" dn
 ```
 
-
-Run script:
-```
+Create in 7.0:
+```bash
 python3.9 70.py \
 --api_jsonrpc 'https://127.0.0.1:44370/api_jsonrpc.php' \
 --token 'e4ca8af31d6c67e724bec411c23760d2867f96f327446d56ce9db2414c7871b1' \
+--host 'dc' \
+--port '389' \
+--base_dn 'OU=Domain users,DC=custom,DC=lan' \
+--bind_dn 'CN=zbxldap,OU=Service users,DC=custom,DC=lan' \
+--bind_password 'Abc12345'
+```
+
+Create in 7.2:
+```bash
+python3.9 72.py \
+--api_jsonrpc 'https://127.0.0.1:44372/api_jsonrpc.php' \
+--token '7aad548037e06da49c5f29cfe990355b25ab0bb482565c79cbdb5ef7164fe565' \
 --host 'dc' \
 --port '389' \
 --base_dn 'OU=Domain users,DC=custom,DC=lan' \
