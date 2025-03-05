@@ -1,11 +1,11 @@
 #!/usr/bin/env python3.9
-import yaml
-import json
-from jsonpath_ng import jsonpath, parse
-import requests
-from pprint import pprint
-import urllib3
 import argparse
+import yaml
+
+import json
+from jsonpath_ng import parse
+import requests
+import urllib3
 
 def main():
 
