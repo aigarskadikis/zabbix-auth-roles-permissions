@@ -14,7 +14,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--api_jsonrpc',help="'https://127.0.0.1:44372/api_jsonrpc.php'",type=str,required=True)
-    parser.add_argument('--token',help="'7aad548037e06da49c5f29cfe990355b25ab0bb482565c79cbdb5ef7164fe565'",type=str,required=True)
+    parser.add_argument('--token',help="'c40909c684312e2d8c2ca59811cc034e90ac31448a9e9ede8d70f3564aedcdf3'",type=str,required=True)
 
     # LDAP settings
     parser.add_argument('--host',help="'dc'",type=str,required=True)
@@ -210,16 +210,27 @@ def main():
     provision_groups = []
 
     # iterate through YAML (this is third reference to same file)
+
     for LDAP_group_pattern, group in data.items():
         prefix = group["prefix"]
+        superAdmin = group.get("superAdmin", False)
+
+        print(f"Prefix: {prefix}, Super: {superAdmin}")
+
 
         print(LDAP_group_pattern)
 
         # go through all user groups to find and pick up an existing user group ID
         for ug in userGroups:
             if ug['name'] == prefix:
-                provision_groups.append({"name":LDAP_group_pattern,"roleid":"2","user_groups":[{"usrgrpid":ug['usrgrpid']}]})
+
+
+                if superAdmin:
+                    provision_groups.append({"name":LDAP_group_pattern,"roleid":"3","user_groups":[{"usrgrpid":ug['usrgrpid']}]})
+                else:
+                    provision_groups.append({"name":LDAP_group_pattern,"roleid":"2","user_groups":[{"usrgrpid":ug['usrgrpid']}]})
                 break
+    print(provision_groups)
 
     if ldapSettingsFound:
 

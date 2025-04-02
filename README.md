@@ -100,7 +100,7 @@ Create in 7.2:
 ```bash
 python3.9 72.py \
 --api_jsonrpc 'https://127.0.0.1:44372/api_jsonrpc.php' \
---token '7aad548037e06da49c5f29cfe990355b25ab0bb482565c79cbdb5ef7164fe565' \
+--token 'c40909c684312e2d8c2ca59811cc034e90ac31448a9e9ede8d70f3564aedcdf3' \
 --host 'dc' \
 --port '389' \
 --base_dn 'OU=Domain users,DC=custom,DC=lan' \

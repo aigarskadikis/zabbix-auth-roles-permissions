@@ -4,4 +4,6 @@ WindowsTeamWeTrust:
   prefix: it/win
 Oracle-DB-admins:
   prefix: it/oracle
-
+MonitoringTeam:
+  prefix: it
+  superAdmin: yes
