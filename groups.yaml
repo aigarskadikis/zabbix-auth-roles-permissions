@@ -5,5 +5,5 @@ WindowsTeamWeTrust:
 Oracle-DB-admins:
   prefix: it/oracle
 MonitoringTeam:
-  prefix: it
+  prefix: it/dev
   superAdmin: yes

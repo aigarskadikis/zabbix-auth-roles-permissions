@@ -217,19 +217,19 @@ def main():
 
         print(f"Prefix: {prefix}, Super: {superAdmin}")
 
-
         print(LDAP_group_pattern)
 
         # go through all user groups to find and pick up an existing user group ID
         for ug in userGroups:
             if ug['name'] == prefix:
 
-
+                # if "superAdmin: yes" then promote user role to "Zabbix Super Admin" (host/template group relations will not matter)
                 if superAdmin:
                     provision_groups.append({"name":LDAP_group_pattern,"roleid":"3","user_groups":[{"usrgrpid":ug['usrgrpid']}]})
                 else:
                     provision_groups.append({"name":LDAP_group_pattern,"roleid":"2","user_groups":[{"usrgrpid":ug['usrgrpid']}]})
                 break
+
     print(provision_groups)
 
     if ldapSettingsFound:
