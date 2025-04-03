@@ -1,20 +1,19 @@
-#!/usr/bin/env python3.9
+#!/usr/bin/env python3
 import argparse
-import yaml
-
 import json
+
 from jsonpath_ng import parse
 import requests
 import urllib3
+import yaml
+
 
 def main():
-
     urllib3.disable_warnings()
-
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--api_jsonrpc',help="'https://127.0.0.1:44372/api_jsonrpc.php'",type=str,required=True)
-    parser.add_argument('--token',help="'c40909c684312e2d8c2ca59811cc034e90ac31448a9e9ede8d70f3564aedcdf3'",type=str,required=True)
+    parser.add_argument('--token',help="'7aad548037e06da49c5f29cfe990355b25ab0bb482565c79cbdb5ef7164fe565'",type=str,required=True)
 
     # LDAP settings
     parser.add_argument('--host',help="'dc'",type=str,required=True)
@@ -22,6 +21,7 @@ def main():
     parser.add_argument('--base_dn',help="'OU=Domain users,DC=custom,DC=lan'",type=str,required=True)
     parser.add_argument('--bind_dn',help="'CN=zbxldap,OU=Service users,DC=custom,DC=lan'",type=str,required=True)
     parser.add_argument('--bind_password',help="'Abc12345'",type=str,required=True)
+    parser.add_argument('--groups_file',help="'groups_test.yaml'",type=str,required=True)
 
     args = parser.parse_args()
 
@@ -34,6 +34,8 @@ def main():
     base_dn = args.base_dn
     bind_dn = args.bind_dn
     bind_password = args.bind_password
+
+    groups_file = args.groups_file
 
     # define token in header
     headers = {'Content-Type': 'application/json', 'Authorization': 'Bearer '+token}
@@ -60,7 +62,7 @@ def main():
     #print('User groups:');pprint(userGroups);print()
 
     # Load YAML file
-    with open("groups.yaml", "r") as file:
+    with open(groups_file, "r") as file:
         data = yaml.safe_load(file)
 
     # Iterate over YAML data
@@ -210,7 +212,6 @@ def main():
     provision_groups = []
 
     # iterate through YAML (this is third reference to same file)
-
     for LDAP_group_pattern, group in data.items():
         prefix = group["prefix"]
         superAdmin = group.get("superAdmin", False)
@@ -229,8 +230,6 @@ def main():
                 else:
                     provision_groups.append({"name":LDAP_group_pattern,"roleid":"2","user_groups":[{"usrgrpid":ug['usrgrpid']}]})
                 break
-
-    print(provision_groups)
 
     if ldapSettingsFound:
 
@@ -300,7 +299,7 @@ def main():
             "group_filter": "",
             "group_membership": "memberOf",
             "user_ref_attr": "",
-            "provision_media": [],
+            "provision_media": [{"mediatypeid":"4","name":"email","attribute":"mail","active":"0","severity":"63","period":"1-7,00:00-24:00"}],
             "provision_groups": provision_groups
             }
             ,"id":1}
